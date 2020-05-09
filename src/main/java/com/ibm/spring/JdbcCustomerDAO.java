@@ -18,22 +18,21 @@ public class JdbcCustomerDAO implements CustomerDAO {
     public void addCustomer(CustomerTO cto) {
 
 
-            String sql = "insert into customers values(:cid,:cname,:email,:phone,:city)";
+        String sql = "insert into customers values(:cid,:cname,:email,:phone,:city)";
 
-            Map<String, Object> parameters = new HashMap<String, Object>();
-            parameters.put("cid", cto.getCid());
-            parameters.put("cname", cto.getCname());
-            parameters.put("email", cto.getEmail());
-            parameters.put("phone", cto.getPhone());
-            parameters.put("city", cto.getCity());
-
-
-
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("cid", cto.getCid());
+        parameters.put("cname", cto.getCname());
+        parameters.put("email", cto.getEmail());
+        parameters.put("phone", cto.getPhone());
+        parameters.put("city", cto.getCity());
+        namedParameterJdbcTemplate.update(sql,parameters);
 
     }
+
     public void updateCustomer(CustomerTO cto) {
 
-        String sql = "update customer set cname =:cname, email = :email,phone=:phone,city=:city,where cid =:cid";
+        String sql = "update customers set cname =:cname, email = :email,phone=:phone,city=:city,where cid =:cid";
 
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("cname", cto.getCname());
@@ -41,8 +40,10 @@ public class JdbcCustomerDAO implements CustomerDAO {
         parameters.put("phone", cto.getPhone());
         parameters.put("city", cto.getCity());
         parameters.put("cid", cto.getCid());
+        namedParameterJdbcTemplate.update(sql,parameters);
 
     }
+
     public void deleteCustomer(int cid) {
 
         String sql = "delete from customers where cid =:cid";
@@ -51,9 +52,10 @@ public class JdbcCustomerDAO implements CustomerDAO {
         parameter.put("cid", cid);
         namedParameterJdbcTemplate.update(sql, parameter);
     }
-    public CustomerTO getCustomerBYCid(int cid) throws  EmptyResultDataAccessException {
 
+    public CustomerTO getCustomerBYCid(int cid) throws EmptyResultDataAccessException {
 
+        try {
 
 
             String sql = "select * from customers where cid =:cid";
@@ -62,18 +64,28 @@ public class JdbcCustomerDAO implements CustomerDAO {
             CustomerTO cto = (CustomerTO) namedParameterJdbcTemplate.queryForObject(sql, parameter, new CustomerRowMapper());
 
 
+            return cto;
 
-        return cto;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
-    public List<CustomerTO> getAllCustomers() throws EmptyResultDataAccessException {
 
+    public List<CustomerTO> getAllCustomers() {
 
+        try {
             String sql = "select * from customers";
-            Map<String, ?> map = null;
+            Map<String, Object> map = new HashMap<String,Object>();
             List<CustomerTO> list = (List<CustomerTO>) namedParameterJdbcTemplate.query(sql, map, new CustomerRowMapper());
 
 
-        return list;
+            return list;
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 
